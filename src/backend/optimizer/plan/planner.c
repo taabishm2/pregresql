@@ -68,6 +68,8 @@
 #include "utils/selfuncs.h"
 #include "utils/syscache.h"
 
+#include "/pregresql/src/grpc/client.h"
+
 /* GUC parameters */
 double		cursor_tuple_fraction = DEFAULT_CURSOR_TUPLE_FRACTION;
 int			debug_parallel_query = DEBUG_PARALLEL_OFF;

@@ -1,0 +1,93 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package postgresGRPC;
+
+// ObjectID : a fundamental type in Postgres
+// internal identifier used by the system to refer to objects, such as tables, indexes
+// and data operations
+message Oid {
+    uint32 oid = 1;
+}
+
+message TargetEntry {
+    string resname = 1;
+    Oid oid = 2
+}
+
+// contains a list of targetentries
+message TargetList {
+    repeated TargetEntry targetEntries = 1;
+}
+
+// Relation Oids
+message relationOid {
+    Oid relOid = 1;
+}
+
+message relationsOids {
+    repeated relationOid relationsOids = 1;
+}
+
+// rtable : Range table entries
+// primnodes.h
+message Alias{
+    string aliasname = 1;
+    repeated string colnames = 2;
+}
+
+// RangeTblEntry - parsenodes.h
+message RangeTableEntry {
+    Alias eref = 1;
+    Oid relid = 2;
+}
+
+message rtable {
+    repeated RangeTableEntry rangeTableEntries = 1;
+}
+
+// define a constant int, for qualification conditions
+message constantInt {
+    int32 constInt = 1;
+}
+
+//primnodes.h - OpExpr
+message OpExpr{
+    Oid opno = 1;
+// define a constant int, for qualification conditions
+message constantInt {
+    int32 constInt = 1;
+}
+
+//primnodes.h - OpExpr
+message OpExpr{
+    Oid opno = 1;
+
+}
+
+//primnodes.h Var struct
+message Var {
+    Oid relid = 1;
+    int32 attrNumber = 2;
+}
+
+// define a constant int, for qualification conditions
+ message constantInt {
+     int32 constInt = 1;
+ }
+
+
+
