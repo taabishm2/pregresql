@@ -277,6 +277,10 @@ planner(Query *parse, const char *query_string, int cursorOptions,
 {
 	PlannedStmt *result;
 
+	initClient();
+	elog(LOG, "Initialized client");
+	// SayHello();
+
 	if (planner_hook)
 		result = (*planner_hook) (parse, query_string, cursorOptions, boundParams);
 	else

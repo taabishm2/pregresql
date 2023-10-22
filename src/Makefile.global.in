@@ -1117,5 +1117,5 @@ rm -f '$(DESTDIR)${bitcodedir}/$(1).index.bc'
 
 endef
 
-+LIBS += -L/pregresql/src/grpc/cmake/build -lclient_grpc 
-+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/pregresql/src/grpc/cmake/build
+LIBS += -L/pregresql/src/grpc/cmake/build -lclient_grpc 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/pregresql/src/grpc/cmake/build
