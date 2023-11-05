@@ -68,8 +68,6 @@
 #include "utils/selfuncs.h"
 #include "utils/syscache.h"
 
-#include "/pregresql/src/grpc/client.h"
-
 /* GUC parameters */
 double		cursor_tuple_fraction = DEFAULT_CURSOR_TUPLE_FRACTION;
 int			debug_parallel_query = DEBUG_PARALLEL_OFF;
@@ -276,10 +274,6 @@ planner(Query *parse, const char *query_string, int cursorOptions,
 		ParamListInfo boundParams)
 {
 	PlannedStmt *result;
-
-	initClient();
-	elog(LOG, "Initialized client");
-	// SayHello();
 
 	if (planner_hook)
 		result = (*planner_hook) (parse, query_string, cursorOptions, boundParams);

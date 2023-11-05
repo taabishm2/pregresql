@@ -112,7 +112,7 @@ struct debug_expect
 	int			s2k_count;
 	int			s2k_cipher_algo;
 	int			s2k_digest_algo;
-	int			compress_algo;
+	int			compress_algo;relation = AllocateRelationDesc(relp);
 	int			use_sess_key;
 	int			disable_mdc;
 	int			unicode_mode;

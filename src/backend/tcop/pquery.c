@@ -920,10 +920,12 @@ PortalRunSelect(Portal portal,
 			nprocessed = RunFromStore(portal, direction, (uint64) count, dest);
 		else
 		{
+			elog(LOG, "We are in query.c>PortalRunSelect for %s\n", queryDesc->sourceText);
 			PushActiveSnapshot(queryDesc->snapshot);
 			ExecutorRun(queryDesc, direction, (uint64) count,
 						portal->run_once);
 			nprocessed = queryDesc->estate->es_processed;
+			elog(LOG, "We executed the query in query.c>PortalRunSelect for %s %s\n", queryDesc->sourceText);
 			PopActiveSnapshot();
 		}
 

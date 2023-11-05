@@ -303,6 +303,7 @@ ExecutorRun(QueryDesc *queryDesc,
 			ScanDirection direction, uint64 count,
 			bool execute_once)
 {
+	elog(LOG, "We are in execMain.c>ExecutorRun for %s\n", queryDesc->sourceText);
 	if (ExecutorRun_hook)
 		(*ExecutorRun_hook) (queryDesc, direction, count, execute_once);
 	else
