@@ -41,6 +41,7 @@ using postgresGRPC::Greeter;
 using postgresGRPC::HelloReply;
 using postgresGRPC::HelloRequest;
 using postgresGRPC::PlannedStmtRPC;
+using postgresGRPC::PlannedStmt;
 
 using namespace std;
 
@@ -106,6 +107,24 @@ class GreeterClient {
     }
   }
 
+  std::string executeOnServer(const std::string& plannedStmtString) {
+    PlannedStmt request;
+    request.set_plantree(plannedStmtString);
+
+    HelloReply reply;
+    ClientContext context;
+
+    Status status = stub_->executeOnServer(&context, request, &reply);
+
+    if (status.ok()) {
+      return reply.message();
+    } else {
+      std::cout << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return "RPC failed";
+    }
+  }
+
  private:
   std::unique_ptr<Greeter::Stub> stub_;
 };
@@ -114,6 +133,13 @@ extern "C" int SayHello(char message[]) {
     // RPC is created and response is stored
     string msg(message);
     client.SayHello(msg);
+    return 0;
+}
+
+
+extern "C" int executeOnServer(char plannedStmtString[]) {
+    string msg(plannedStmtString);
+    client.executeOnServer(plannedStmtString);
     return 0;
 }
 
@@ -139,7 +165,7 @@ extern "C" int sendPlan(char* inputStr) {
 extern "C" void initClient() {
 
 
-   std::ofstream outputFile("/home/tabish/pregres.log"); // create a new file called "example.txt"
+   std::ofstream outputFile("/pregres.log"); // create a new file called "example.txt"
 
   if (outputFile.is_open()) { // check if the file is opened successfully
     outputFile << "Init function was called"; // write "Hello, world!" to the file

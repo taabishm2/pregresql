@@ -64,6 +64,17 @@ pprint(const void *obj)
 	pfree(f);
 }
 
+char*
+get_encoded_string(const void *obj)
+{
+	char	   *s;
+	char	   *f;
+	char       *result;
+
+	s = nodeToString(obj);
+	return pretty_format_node_dump(s);
+}
+
 /*
  * elog_node_display
  *	  send pretty-printed contents of Node to postmaster log

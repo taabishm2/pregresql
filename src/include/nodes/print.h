@@ -21,6 +21,7 @@
 
 extern void print(const void *obj);
 extern void pprint(const void *obj);
+extern char* get_encoded_string(const void *obj);
 extern void elog_node_display(int lev, const char *title,
 							  const void *obj, bool pretty);
 extern char *format_node_dump(const char *dump);

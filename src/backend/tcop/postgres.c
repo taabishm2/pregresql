@@ -79,6 +79,7 @@
 #include "utils/timestamp.h"
 
 #include "/pregresql/src/grpc/client.h"
+#include "nodes/print.h"
 
 /* ----------------
  *		global variables
@@ -1274,6 +1275,14 @@ exec_simple_query(const char *query_string)
 		SayHello("here it comes!");
 		// elog(LOG, "Initialized client");
 		// // SayHello();
+		
+		if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
+			char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);
+			executeOnServer(plannedstmt);
+		} else {
+			printf("SOMETHING WAS NULL\n");
+		}
+
 		elog(NOTICE, "Ohoo balle balle shawa shawa\nmahiya say shawa shawa\n");
 		
 		/*

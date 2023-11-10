@@ -12,6 +12,7 @@ service Greeter {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
   rpc sendPlan (PlannedStmtRPC) returns (HelloReply) {}
+  rpc executeOnServer(PlannedStmt) returns (HelloReply) {}
 }
 
 // The request message containing the user's name.
@@ -26,4 +27,8 @@ message HelloReply {
 
 message PlannedStmtRPC {
   int32 plan_width = 1;
+}
+
+message PlannedStmt {
+  string planTree = 1;
 }

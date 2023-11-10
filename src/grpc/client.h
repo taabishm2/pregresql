@@ -13,8 +13,12 @@ int SayHello(char message[]);
 #ifdef __cplusplus
 extern "C"
 #endif
+int executeOnServer(char* plannedStmtString);
+
+#ifdef __cplusplus
+extern "C"
+#endif
 int sendPlan(char* inputStr);
-//int sendPlan(int plan_width);
 
 #ifdef __cplusplus
 extern "C"
