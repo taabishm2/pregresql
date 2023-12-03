@@ -26,6 +26,9 @@
 #include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef USE_VALGRIND
 #include <valgrind/valgrind.h>
@@ -1004,6 +1007,79 @@ pg_plan_queries(List *querytrees, const char *query_string, int cursorOptions,
 	return stmt_list;
 }
 
+int contains_keyword(const char *str, const char *keyword) {
+    char *lower_str, *lower_keyword, *found;
+
+    // Convert both strings to lowercase for case-insensitive comparison
+    lower_str = strdup(str);
+    for (int i = 0; lower_str[i]; i++) {
+        lower_str[i] = tolower(lower_str[i]);
+    }
+
+    lower_keyword = strdup(keyword);
+    for (int i = 0; lower_keyword[i]; i++) {
+        lower_keyword[i] = tolower(lower_keyword[i]);
+    }
+
+    // Check if keyword is in string
+    found = strstr(lower_str, lower_keyword);
+
+    free(lower_str);
+    free(lower_keyword);
+
+    return (found != NULL);
+}
+
+// EXTRACT SELECT DATA
+void run_select_on_sundial(const char *query_string) {
+    // Check for NULL, empty string, or absence of required keywords
+    if (!query_string || strlen(query_string) == 0 ||
+        !contains_keyword(query_string, "select") ||
+        !contains_keyword(query_string, "test_table")) {
+        printf("Invalid or non-matching query string.\n");
+        return;
+    }
+
+    char *query_copy, *token;
+    const char *delim_space = " ";
+    const char *delim_equals = "=";
+
+    // Duplicate the query string since strtok modifies the string
+    query_copy = strdup(query_string);
+
+    // Extracting the part after "SELECT" and before "FROM"
+    strtok(query_copy, delim_space); // This will return "SELECT"
+    token = strtok(NULL, "FROM"); // This will return the columns
+
+    // Allocate memory and copy columns (need to trim the trailing space)
+    char *columns = (char*)malloc(strlen(token));
+    strncpy(columns, token, strlen(token) - 1);
+
+    // Proceed to extract table name
+    strtok(NULL, delim_space); // This will return "FROM"
+    token = strtok(NULL, "WHERE"); // This will return the table name
+
+    // Allocate memory and copy table name (need to trim the trailing space)
+    // char *table_name = (char*)malloc(strlen(token));
+    // strncpy(table_name, token, strlen(token) - 1);
+
+    // Extracting the ID value
+    strtok(NULL, delim_equals); // This skips the "WHERE id ="
+    token = strtok(NULL, delim_space); // This will return the ID value
+
+    // Convert string to integer
+    int id_value = atoi(token);
+
+    free(query_copy);
+
+    // Call RunSelect with the extracted columns and ID value
+    const char *result = RunSelect(columns, id_value);
+    elog(NOTICE, "RunSelect result: %s\n", result);
+
+    // Clean up
+    free(columns);
+    // free(table_name);
+}
 
 /*
  * exec_simple_query
@@ -1276,12 +1352,11 @@ exec_simple_query(const char *query_string)
 		// elog(LOG, "Initialized client");
 		// // SayHello();
 
-		const char* columns = "colA,colB,colC";
-		int search_key = 67890;
+		// const char* columns = "colA,colB,colC";
+		// int search_key = 67890;
 
 		// Call the RunSelect function
-		const char* result = RunSelect(columns, search_key);
-		elog(NOTICE, "RunSelect result: %s\n", result);
+    	run_select_on_sundial(query_string);
 
 		if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
 			char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);
