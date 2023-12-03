@@ -132,7 +132,7 @@ class GreeterClient {
 
   ////////////////////////////////////////////////////////////////////
 
-  int RunSelect(const char* column_names, int search_key) {
+std::string RunSelect(const char* column_names, int search_key) {
     // Create and populate the RunSelectRequest
     RunSelectRequest request;
     std::string column_name_str(column_names);
@@ -152,13 +152,14 @@ class GreeterClient {
 
     // Handle the response
     if (status.ok()) {
-      std::cout << "RPC success: " << reply.message() << std::endl;
-      return 0; // Success
+      return reply.message(); // Return the message from the response
     } else {
-      std::cout << "RPC failed: " << status.error_code() << ": " << status.error_message() << std::endl;
-      return 1; // Failure
+      // Construct and return an error message
+      std::string error_message = "RPC failed: " + std::to_string(status.error_code()) + ": " + status.error_message();
+      std::cout << error_message << std::endl;
+      return error_message;
     }
-  }
+}
 
  private:
   std::unique_ptr<Greeter::Stub> stub_;
@@ -180,9 +181,13 @@ extern "C" int executeOnServer(char plannedStmtString[]) {
 
 //////////////////////////////////////////////////////////////
 
-extern "C" int RunSelect(const char* column_names, int search_key) {
-  client.RunSelect(column_names, search_key);
-  return 0;
+extern "C" const char* RunSelect(const char* column_names, int search_key) {
+  std::string result = client.RunSelect(column_names, search_key);
+  static char resultBuffer[1024];
+  strncpy(resultBuffer, result.c_str(), sizeof(resultBuffer));
+  resultBuffer[sizeof(resultBuffer) - 1] = '\0'; // Ensure null termination
+
+  return resultBuffer;
 }
 
 //extern "C" int sendPlan(int plan_width) {

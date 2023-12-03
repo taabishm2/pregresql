@@ -1280,15 +1280,9 @@ exec_simple_query(const char *query_string)
 		int search_key = 67890;
 
 		// Call the RunSelect function
-		int result = RunSelect(columns, search_key);
+		const char* result = RunSelect(columns, search_key);
+		elog(NOTICE, "RunSelect result: %s\n", result);
 
-		// Check the result
-		if (result == 0) {
-			elog(NOTICE, "RunSelect executed successfully.\n");
-		} else {
-			elog(NOTICE, "RunSelect failed.\n");
-		}
-		
 		if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
 			char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);
 			executeOnServer(plannedstmt);

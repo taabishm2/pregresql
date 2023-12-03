@@ -30,4 +30,4 @@ void initClient();
 #ifdef __cplusplus
 extern "C"
 #endif
-int RunSelect(const char* column_names, int search_key);
+const char* RunSelect(const char* column_names, int search_key);
