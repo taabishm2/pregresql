@@ -13,6 +13,7 @@ service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
   rpc sendPlan (PlannedStmtRPC) returns (HelloReply) {}
   rpc executeOnServer(PlannedStmt) returns (HelloReply) {}
+  rpc RunSelect (RunSelectRequest) returns (Response);
 }
 
 // The request message containing the user's name.
@@ -31,4 +32,17 @@ message PlannedStmtRPC {
 
 message PlannedStmt {
   string planTree = 1;
+}
+
+
+
+// Request message for run_select
+message RunSelectRequest {
+  repeated string column_names = 1;
+  int32 search_key = 2;
+}
+
+// Response message (can be expanded as needed)
+message Response {
+  string message = 1;
 }

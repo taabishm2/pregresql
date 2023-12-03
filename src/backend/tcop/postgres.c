@@ -1275,6 +1275,19 @@ exec_simple_query(const char *query_string)
 		SayHello("here it comes!");
 		// elog(LOG, "Initialized client");
 		// // SayHello();
+
+		const char* columns = "colA,colB,colC";
+		int search_key = 67890;
+
+		// Call the RunSelect function
+		int result = RunSelect(columns, search_key);
+
+		// Check the result
+		if (result == 0) {
+			elog(NOTICE, "RunSelect executed successfully.\n");
+		} else {
+			elog(NOTICE, "RunSelect failed.\n");
+		}
 		
 		if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
 			char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);

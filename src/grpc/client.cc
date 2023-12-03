@@ -43,6 +43,10 @@ using postgresGRPC::HelloRequest;
 using postgresGRPC::PlannedStmtRPC;
 using postgresGRPC::PlannedStmt;
 
+using postgresGRPC::RunSelectRequest;
+using postgresGRPC::Response;
+
+
 using namespace std;
 
 #include "string.h"
@@ -125,6 +129,37 @@ class GreeterClient {
     }
   }
 
+
+  ////////////////////////////////////////////////////////////////////
+
+  int RunSelect(const char* column_names, int search_key) {
+    // Create and populate the RunSelectRequest
+    RunSelectRequest request;
+    std::string column_name_str(column_names);
+    std::stringstream ss(column_name_str);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+      request.add_column_names(item);
+    }
+    request.set_search_key(search_key);
+
+    // Prepare the response and context
+    Response reply;
+    ClientContext context;
+
+    // Make the RPC call
+    Status status = stub_->RunSelect(&context, request, &reply);
+
+    // Handle the response
+    if (status.ok()) {
+      std::cout << "RPC success: " << reply.message() << std::endl;
+      return 0; // Success
+    } else {
+      std::cout << "RPC failed: " << status.error_code() << ": " << status.error_message() << std::endl;
+      return 1; // Failure
+    }
+  }
+
  private:
   std::unique_ptr<Greeter::Stub> stub_;
 };
@@ -141,6 +176,13 @@ extern "C" int executeOnServer(char plannedStmtString[]) {
     string msg(plannedStmtString);
     client.executeOnServer(plannedStmtString);
     return 0;
+}
+
+//////////////////////////////////////////////////////////////
+
+extern "C" int RunSelect(const char* column_names, int search_key) {
+  client.RunSelect(column_names, search_key);
+  return 0;
 }
 
 //extern "C" int sendPlan(int plan_width) {
