@@ -1,8 +1,8 @@
 
 
 #ifdef __cplusplus
-class GreeterClient;
-extern GreeterClient client;
+class PostdialClient;
+extern PostdialClient client;
 #endif
 
 #ifdef __cplusplus

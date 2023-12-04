@@ -80,10 +80,10 @@ target_link_libraries(sd_grpc_proto
   ${_GRPC_GRPCPP}
   ${_PROTOBUF_LIBPROTOBUF})
 
-#Targets greeter_[async_](client|server)
+#Targets Postdial_[async_](client|server)
 
 foreach(_target
-  greeter_server)
+postdial_server)
   add_executable(${_target} "${_target}.cc")
   target_link_libraries(${_target}
     hw_grpc_proto

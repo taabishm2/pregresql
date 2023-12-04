@@ -120,10 +120,10 @@ extern "C" void initSdClient() {
 //   std::string target_str = absl::GetFlag(FLAGS_target);
   // We indicate that the channel isn't authenticated (use of
   // InsecureChannelCredentials()).
-  // SundialPostgresRPCClient greeter(
+  // SundialPostgresRPCClient Postdial(
   //     grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
   // std::string user("TABLE_NAME");
-  // std::string reply = greeter.getClassCatalog(user);
+  // std::string reply = Postdial.getClassCatalog(user);
   // std::cout << "SundialPostgres received: " << reply << std::endl;
 
 //   return 0;

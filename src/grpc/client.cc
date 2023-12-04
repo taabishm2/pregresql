@@ -37,7 +37,7 @@
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-using postgresGRPC::Greeter;
+using postgresGRPC::Postdial;
 using postgresGRPC::HelloReply;
 using postgresGRPC::HelloRequest;
 using postgresGRPC::PlannedStmtRPC;
@@ -55,11 +55,11 @@ using namespace std;
 
 #include "string.h"
 
-class GreeterClient {
+class PostdialClient {
  public:
   
   void create_stub(std::shared_ptr<Channel> channel) {
-    stub_ = Greeter::NewStub(channel);
+    stub_ = Postdial::NewStub(channel);
   }
 
   // Assembles the client's payload, sends it and presents the response back
@@ -228,7 +228,7 @@ std::string InitSchema(const std::vector<std::string>& column_names,
   }
 
  private:
-  std::unique_ptr<Greeter::Stub> stub_;
+  std::unique_ptr<Postdial::Stub> stub_;
 };
 
 extern "C" int SayHello(char message[]) {
@@ -335,4 +335,4 @@ extern "C" void initClient() {
     client.create_stub(channel);
 }
 
-GreeterClient client;
+PostdialClient client;

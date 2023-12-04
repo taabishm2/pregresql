@@ -34,14 +34,14 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-using postgresGRPC::Greeter;
+using postgresGRPC::Postdial;
 using postgresGRPC::HelloReply;
 using postgresGRPC::HelloRequest;
 using postgresGRPC::PlannedStmtRPC;
 
 
 // Logic and data behind the server's behavior.
-class GreeterServiceImpl final : public Greeter::Service {
+class PostdialServiceImpl final : public Postdial::Service {
   Status SayHello(ServerContext* context, const HelloRequest* request,
                   HelloReply* reply) override {
     std::cout << "received message: " << request->name() << std::endl;
@@ -63,7 +63,7 @@ class GreeterServiceImpl final : public Greeter::Service {
 
 void RunServer() {
   std::string server_address("0.0.0.0:50051");
-  GreeterServiceImpl service;
+  PostdialServiceImpl service;
 
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
