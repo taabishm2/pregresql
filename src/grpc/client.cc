@@ -46,6 +46,8 @@ using postgresGRPC::PlannedStmt;
 using postgresGRPC::RunSelectRequest;
 using postgresGRPC::RunInsertsRequest;
 using postgresGRPC::StringList;
+using postgresGRPC::InitSchemaRequest;
+using postgresGRPC::ColumnDetailRequest;
 using postgresGRPC::Response;
 
 
@@ -195,6 +197,36 @@ std::string RunInsert(const char* column_names, const char* values) {
     }
 }
 
+std::string InitSchema(const std::vector<std::string>& column_names,
+                          const std::vector<int>& column_sizes,
+                          const std::vector<std::string>& column_types,
+                          const std::string& table_name,
+                          const std::string& key_column_name) {
+    InitSchemaRequest request;
+    request.set_table_name(table_name);
+    request.set_key_column_name(key_column_name);
+
+    for (size_t i = 0; i < column_names.size(); ++i) {
+        ColumnDetailRequest* column = request.add_columns();
+        column->set_name(column_names[i]);
+        column->set_size(column_sizes[i]);
+        column->set_type(column_types[i]);
+    }
+
+    Response reply;
+    ClientContext context;
+
+    Status status = stub_->InitSchema(&context, request, &reply);
+
+    if (status.ok()) {
+        return reply.message();
+    } else {
+        std::string error_message = "RPC failed: " + std::to_string(status.error_code()) + ": " + status.error_message();
+        std::cout << error_message << std::endl;
+        return error_message;
+    }
+  }
+
  private:
   std::unique_ptr<Greeter::Stub> stub_;
 };
@@ -229,6 +261,36 @@ extern "C" const char* RunInsert(const char* column_names, const char* values) {
     static char resultBuffer[1024];
     strncpy(resultBuffer, result.c_str(), sizeof(resultBuffer));
     resultBuffer[sizeof(resultBuffer) - 1] = '\0'; // Ensure null termination
+    return resultBuffer;
+}
+
+extern "C" const char* InitSchema(const char* column_names, const char* column_sizes, 
+                                  const char* column_types, const char* table_name, 
+                                  const char* key_column_name) {
+    static char resultBuffer[1024];
+
+    // Parse the column details from the input strings
+    std::vector<std::string> names, types;
+    std::vector<int> sizes;
+    std::stringstream names_stream(column_names), sizes_stream(column_sizes), types_stream(column_types);
+    std::string item;
+
+    while (std::getline(names_stream, item, ',')) {
+        names.push_back(item);
+    }
+
+    while (std::getline(sizes_stream, item, ',')) {
+        sizes.push_back(std::stoi(item));
+    }
+
+    while (std::getline(types_stream, item, ',')) {
+        types.push_back(item);
+    }
+
+    std::string result = client.InitSchema(names, sizes, types, table_name, key_column_name);
+    strncpy(resultBuffer, result.c_str(), sizeof(resultBuffer));
+    resultBuffer[sizeof(resultBuffer) - 1] = '\0'; // Ensure null termination
+
     return resultBuffer;
 }
 

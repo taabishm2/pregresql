@@ -1112,13 +1112,94 @@ void run_insert_on_sundial(const char* query_string) {
 
     if (column_names && values) {
         const char* result = RunInsert(column_names, values);
-        printf("Insert result: %s\n", result);
+        elog(NOTICE, "Insert result: %s\n", result);
 
         free(column_names);
         free(values);
     } else {
-        printf("Error parsing query.\n");
+         elog(NOTICE, "Insert query failed");
     }
+}
+
+void parse_create_table_query(const char* query_string) {
+    if (!query_string || strlen(query_string) == 0 ||
+        !contains_keyword(query_string, "create table") ||
+        !contains_keyword(query_string, "test_table")) {
+        printf("Invalid or non-matching query string.\n");
+        return;
+    }
+
+    char* start = strchr(query_string, '(');
+    char* end = strrchr(query_string, ')');
+
+    if (!start || !end || end <= start) {
+        printf("Invalid query format.\n");
+        return;
+    }
+
+    start++;
+
+    size_t len = end - start;
+    char* columns_str = (char*)malloc(len + 1);
+    if (!columns_str) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    strncpy(columns_str, start, len);
+    columns_str[len] = '\0';
+
+    // Splitting column details
+    char* name_str = (char*)malloc(len + 1);
+    char* size_str = (char*)malloc(len + 1);
+    char* type_str = (char*)malloc(len + 1);
+    name_str[0] = size_str[0] = type_str[0] = '\0';
+
+    printf("Column Str: %s\n", columns_str);
+    char* token = strtok(columns_str, ",");
+    while (token) {
+        char name[100], type[100];
+        int size;
+
+        // Trim leading spaces
+        while(*token == ' ') token++;
+
+        if (sscanf(token, "%s %[^ (](%d)", name, type, &size) == 3) {
+            // Column with specified size
+        } else if (sscanf(token, "%s %s", name, type) == 2) {
+            // Column without specified size, default to 100
+            size = 100;
+        } else {
+            printf("Invalid column format.\n");
+            break;
+        }
+
+        strcat(name_str, name);
+        strcat(name_str, ",");
+
+        sprintf(size_str + strlen(size_str), "%d,", size);
+
+        strcat(type_str, type);
+        strcat(type_str, ",");
+
+        token = strtok(NULL, ",");
+    }
+
+    // Remove trailing commas
+    if (strlen(name_str) > 0) name_str[strlen(name_str) - 1] = '\0';
+    if (strlen(size_str) > 0) size_str[strlen(size_str) - 1] = '\0';
+    if (strlen(type_str) > 0) type_str[strlen(type_str) - 1] = '\0';
+
+    // Print the extracted strings
+	const char* result = InitSchema(name_str, size_str, type_str, "test_table", "");
+	elog(NOTICE, "Create result: %s\n", result);
+
+    // Free the allocated memory
+    free(columns_str);
+    free(name_str);
+    free(size_str);
+    free(type_str);
+
 }
 
 /*
