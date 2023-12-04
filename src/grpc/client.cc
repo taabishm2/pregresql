@@ -44,6 +44,8 @@ using postgresGRPC::PlannedStmtRPC;
 using postgresGRPC::PlannedStmt;
 
 using postgresGRPC::RunSelectRequest;
+using postgresGRPC::RunInsertsRequest;
+using postgresGRPC::StringList;
 using postgresGRPC::Response;
 
 
@@ -161,6 +163,38 @@ std::string RunSelect(const char* column_names, int search_key) {
     }
 }
 
+std::string RunInsert(const char* column_names, const char* values) {
+    RunInsertsRequest request;
+    std::string column_name_str(column_names);
+    std::stringstream col_name_ss(column_name_str);
+    std::string item;
+
+    while (std::getline(col_name_ss, item, ',')) {
+        request.add_column_names(item);
+    }
+
+    StringList row_values;
+    std::string value_str(values);
+    std::stringstream value_ss(value_str);
+    while (std::getline(value_ss, item, ',')) {
+        row_values.add_values(item);
+    }
+    *request.add_input_rows() = row_values;
+
+    Response reply;
+    ClientContext context;
+
+    Status status = stub_->RunInserts(&context, request, &reply);
+
+    if (status.ok()) {
+        return reply.message();
+    } else {
+        std::string error_message = "RPC failed: " + std::to_string(status.error_code()) + ": " + status.error_message();
+        std::cout << error_message << std::endl;
+        return error_message;
+    }
+}
+
  private:
   std::unique_ptr<Greeter::Stub> stub_;
 };
@@ -188,6 +222,14 @@ extern "C" const char* RunSelect(const char* column_names, int search_key) {
   resultBuffer[sizeof(resultBuffer) - 1] = '\0'; // Ensure null termination
 
   return resultBuffer;
+}
+
+extern "C" const char* RunInsert(const char* column_names, const char* values) {
+    std::string result = client.RunInsert(column_names, values);
+    static char resultBuffer[1024];
+    strncpy(resultBuffer, result.c_str(), sizeof(resultBuffer));
+    resultBuffer[sizeof(resultBuffer) - 1] = '\0'; // Ensure null termination
+    return resultBuffer;
 }
 
 //extern "C" int sendPlan(int plan_width) {

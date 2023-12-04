@@ -31,3 +31,8 @@ void initClient();
 extern "C"
 #endif
 const char* RunSelect(const char* column_names, int search_key);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+const char* RunInsert(const char* column_names, const char* values);

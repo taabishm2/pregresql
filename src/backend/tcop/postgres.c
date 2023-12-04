@@ -1008,9 +1008,9 @@ pg_plan_queries(List *querytrees, const char *query_string, int cursorOptions,
 }
 
 int contains_keyword(const char *str, const char *keyword) {
-    char *lower_str, *lower_keyword, *found;
+    char *lower_str, *lower_keyword;
+    int found = 0;
 
-    // Convert both strings to lowercase for case-insensitive comparison
     lower_str = strdup(str);
     for (int i = 0; lower_str[i]; i++) {
         lower_str[i] = tolower(lower_str[i]);
@@ -1021,16 +1021,16 @@ int contains_keyword(const char *str, const char *keyword) {
         lower_keyword[i] = tolower(lower_keyword[i]);
     }
 
-    // Check if keyword is in string
-    found = strstr(lower_str, lower_keyword);
+    if (strstr(lower_str, lower_keyword) != NULL) {
+        found = 1;
+    }
 
     free(lower_str);
     free(lower_keyword);
 
-    return (found != NULL);
+    return found;
 }
 
-// EXTRACT SELECT DATA
 void run_select_on_sundial(const char *query_string) {
     // Check for NULL, empty string, or absence of required keywords
     if (!query_string || strlen(query_string) == 0 ||
@@ -1079,6 +1079,46 @@ void run_select_on_sundial(const char *query_string) {
     // Clean up
     free(columns);
     // free(table_name);
+}
+
+// Function to extract a substring between two delimiters in a source string
+char* extract_substring(const char* source, const char* start_delim, const char* end_delim) {
+    char* target = NULL;
+    const char* start = strstr(source, start_delim);
+    if (start) {
+        start += strlen(start_delim);
+        const char* end = strstr(start, end_delim);
+        if (end) {
+            size_t size = end - start;
+            target = malloc(size + 1);
+            strncpy(target, start, size);
+            target[size] = '\0';
+        }
+    }
+    return target;
+}
+
+void run_insert_on_sundial(const char* query_string) {
+    // Return immediately if query_string is null, empty, or doesn't contain required keywords
+    if (!query_string || strlen(query_string) == 0 ||
+        !contains_keyword(query_string, "INSERT") ||
+        !contains_keyword(query_string, "test_table")) {
+        printf("Invalid or non-matching query string.\n");
+        return;
+    }
+
+    char* column_names = extract_substring(query_string, "(", ")");
+    char* values = extract_substring(query_string, "VALUES (", ");");
+
+    if (column_names && values) {
+        const char* result = RunInsert(column_names, values);
+        printf("Insert result: %s\n", result);
+
+        free(column_names);
+        free(values);
+    } else {
+        printf("Error parsing query.\n");
+    }
 }
 
 /*
@@ -1357,6 +1397,7 @@ exec_simple_query(const char *query_string)
 
 		// Call the RunSelect function
     	run_select_on_sundial(query_string);
+		run_insert_on_sundial(query_string);
 
 		if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
 			char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);
