@@ -42,7 +42,6 @@ using postgresGRPC::HelloReply;
 using postgresGRPC::HelloRequest;
 using postgresGRPC::PlannedStmtRPC;
 using postgresGRPC::PlannedStmt;
-
 using postgresGRPC::RunSelectRequest;
 using postgresGRPC::RunInsertsRequest;
 using postgresGRPC::StringList;

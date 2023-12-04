@@ -1153,7 +1153,18 @@ void run_create_table_on_sundial(const char* query_string) {
     char* name_str = (char*)malloc(len + 1);
     char* size_str = (char*)malloc(len + 1);
     char* type_str = (char*)malloc(len + 1);
+    char key_column_name[100] = "";
     name_str[0] = size_str[0] = type_str[0] = '\0';
+
+    char* primaryKeyStr = strstr(columns_str, "PRIMARY KEY");
+    if (primaryKeyStr) {
+        *primaryKeyStr = '\0'; // Truncate the columns_str to remove PRIMARY KEY part
+        sscanf(primaryKeyStr + strlen("PRIMARY KEY ("), "%s", key_column_name);
+        char* bracket = strchr(key_column_name, ')');
+        if (bracket) {
+            *bracket = '\0'; // Remove closing bracket from the key column name
+        }
+    }
 
     printf("Column Str: %s\n", columns_str);
     char* token = strtok(columns_str, ",");
@@ -1163,6 +1174,11 @@ void run_create_table_on_sundial(const char* query_string) {
 
         // Trim leading spaces
         while(*token == ' ') token++;
+
+        if (strstr(token, "PRIMARY KEY") != NULL) {
+            // Skip PRIMARY KEY definition
+            break;
+        }
 
         if (sscanf(token, "%s %[^ (](%d)", name, type, &size) == 3) {
             // Column with specified size
@@ -1191,16 +1207,16 @@ void run_create_table_on_sundial(const char* query_string) {
     if (strlen(type_str) > 0) type_str[strlen(type_str) - 1] = '\0';
 
     // Print the extracted strings
-	const char* result = InitSchema(name_str, size_str, type_str, "test_table", "");
-	elog(NOTICE, "Create result: %s\n", result);
+    const char* result = InitSchema(name_str, size_str, type_str, "test_table", key_column_name);
+    elog(NOTICE, "Create result: %s\n", result);
 
     // Free the allocated memory
     free(columns_str);
     free(name_str);
     free(size_str);
     free(type_str);
-
 }
+
 
 /*
  * exec_simple_query
