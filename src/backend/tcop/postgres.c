@@ -1121,7 +1121,7 @@ void run_insert_on_sundial(const char* query_string) {
     }
 }
 
-void parse_create_table_query(const char* query_string) {
+void run_create_table_on_sundial(const char* query_string) {
     if (!query_string || strlen(query_string) == 0 ||
         !contains_keyword(query_string, "create table") ||
         !contains_keyword(query_string, "test_table")) {
@@ -1469,7 +1469,7 @@ exec_simple_query(const char *query_string)
 
 		// Planner output is in portal->queryDesc->plannedstmt
 		initClient();
-		SayHello("here it comes!");
+		
 		// elog(LOG, "Initialized client");
 		// // SayHello();
 
@@ -1479,15 +1479,14 @@ exec_simple_query(const char *query_string)
 		// Call the RunSelect function
     	run_select_on_sundial(query_string);
 		run_insert_on_sundial(query_string);
+		run_create_table_on_sundial(query_string);
 
-		if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
-			char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);
-			executeOnServer(plannedstmt);
-		} else {
-			printf("SOMETHING WAS NULL\n");
-		}
-
-		elog(NOTICE, "Ohoo balle balle shawa shawa\nmahiya say shawa shawa\n");
+		// if (portal && portal->queryDesc && portal->queryDesc->plannedstmt) {
+		// 	char* plannedstmt = get_encoded_string(portal->queryDesc->plannedstmt);
+		// 	executeOnServer(plannedstmt);
+		// } else {
+		// 	printf("SOMETHING WAS NULL\n");
+		// }
 		
 		/*
 		 * Run the portal to completion, and then drop it (and the receiver).

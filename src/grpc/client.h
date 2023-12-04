@@ -40,4 +40,4 @@ const char* RunInsert(const char* column_names, const char* values);
 #ifdef __cplusplus
 extern "C"
 #endif
-const char* InitSchema(const char* column_names, const char* column_sizes, const char* column_types, const char* table_name, const char* key_column_name) 
+const char* InitSchema(const char* column_names, const char* column_sizes, const char* column_types, const char* table_name, const char* key_column_name);
